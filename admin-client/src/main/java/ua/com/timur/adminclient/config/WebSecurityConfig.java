@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
         .httpBasic().and()
-        .authorizeRequests().antMatchers("/actuator/**").authenticated()
+        .authorizeRequests().antMatchers("/actuator/**").permitAll()
         .and()
         .authorizeRequests().anyRequest().hasAnyRole("ADMIN", "GUEST")
         .and()
