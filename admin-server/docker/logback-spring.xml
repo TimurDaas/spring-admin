@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="10 seconds">
+    <!--FILE_DIR - расположение папки для текущих логов (в конце обязательно должен быть "/")-->
+    <property name="FILE_DIR" value="${logpath:-/deployments/logs}/log/"/>
+    <!--FILE_ARCHIVE_DIR - расположение папки для архивных логов (в конце обязательно должен быть "/")-->
+    <property name="FILE_ARCHIVE_DIR" value="${logpath}/log_archive/"/>
+
+    <property name="rooLevel" value="${loglevelroot:-INFO}"/>
+
+    <!--==========================================================================================================-->
+
+    <property name="FILE_PREFIX" value="spring-admin"/>
+    <property name="FILE_ARCH_SUF_H" value="%d{yyyy-MM-dd_HH}.gz"/>
+
+    <property name="FILE_CURRENT" value="${FILE_DIR}${FILE_PREFIX}"/>
+    <property name="FILE_ARCHIVE" value="${FILE_ARCHIVE_DIR}%d{yyyy-MM,aux}/%d{yyyy-MM-dd,aux}/${FILE_PREFIX}"/>
+    <property name="pattern" value="[%d{dd-MM-yyyy} %d{HH:mm:ss}][%thread][%logger{20}:%L][ %-5p][%m]%n"/>
+
+    <property name="max_history_error" value="365"/>
+    <property name="max_history_debug" value="365"/>
+    <property name="max_history_other" value="365"/>
+
+    <property name="ERROR_CUR_FILE" value="${FILE_CURRENT}_error.log"/>
+    <property name="ERROR_ARCH_FILE" value="${FILE_ARCHIVE}_error_${FILE_ARCH_SUF_H}"/>
+
+    <property name="DEBUG_CUR_FILE" value="${FILE_CURRENT}_debug.log"/>
+    <property name="DEBUG_ARCH_FILE" value="${FILE_ARCHIVE}_debug_${FILE_ARCH_SUF_H}"/>
+
+    <appender name="ERROR_FILE_LOG_F" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${ERROR_CUR_FILE}</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${ERROR_ARCH_FILE}</fileNamePattern>
+            <maxHistory>${max_history_error}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR_FILE_LOG" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ERROR_FILE_LOG_F"/>
+        <includeCallerData>true</includeCallerData>
+        <queueSize>1024</queueSize>
+    </appender>
+
+
+    <appender name="DEBUG_FILE_LOG_F" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${DEBUG_CUR_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${DEBUG_ARCH_FILE}</fileNamePattern>
+            <maxHistory>${max_history_debug}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="DEBUG_FILE_LOG" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="DEBUG_FILE_LOG_F"/>
+        <includeCallerData>true</includeCallerData>
+        <queueSize>1024</queueSize>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>[%d{dd-MM-yyyy} %d{HH:mm:ss}][%thread][%logger{20}:%L][ %-5p][%m]%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="${rooLevel}">
+        <appender-ref ref="DEBUG_FILE_LOG"/>
+        <appender-ref ref="ERROR_FILE_LOG"/>
+    </root>
+
+</configuration>

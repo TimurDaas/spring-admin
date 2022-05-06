@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: admin-server
+
+server:
+  address: ${app.server.address:0.0.0.0}
+  port: ${app.server.port:9990}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+---
+spring:
+  cloud:
+    consul:
+      host: ${app.discovery.host:localhost}
+      port: ${app.discovery.port:8500}
+
+  boot:
+    admin:
+      discovery:
+        ignored-services: consul
