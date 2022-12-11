@@ -24,3 +24,19 @@ spring:
     admin:
       discovery:
         ignored-services: consul
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  cloud:
+    discovery:
+      enabled: false
+
+    consul:
+      enabled: false
+      discovery:
+        enabled: false
